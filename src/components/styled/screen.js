@@ -5,6 +5,8 @@ const StyledScreen = styled.div`
   padding: 4px 8px;
   margin: 2px;
   font-size: 32px;
+  min-width: 246px;
+  display: inline-block;
 `
 
 export default StyledScreen

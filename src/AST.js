@@ -4,6 +4,48 @@ class ASTNode {
     this.left = left
     this.right = right
   }
+
+  evaluate = () => {
+    if (this.token.type === 'LITERAL') {
+      return this.token.symbol
+    } else if (this.token.type === 'FUNCTION') {
+      switch (this.token.symbol) {
+        case '!':
+          function factorial(num) {
+            if(num < 0) {
+              return null
+            }
+            if (num === 0) {
+              return 1
+            } else {
+              return factorial(num - 1)
+            }
+          }
+          return factorial(this.right.evaluate())
+        case '\u221A':
+          return Math.sqrt(this.right.evaluate())
+        default:
+          return null
+      }
+    } else if (this.token.type === 'OPERATOR') {
+      switch (this.token.symbol) {
+        case '+':
+          return this.left.evaluate() + this.right.evaluate()
+        case '-':
+          return this.left.evaluate() - this.right.evaluate()
+        case '\u00D7':
+          return this.left.evaluate() * this.right.evaluate()
+        case '/':
+          return this.left.evaluate() / this.right.evaluate()        
+        case '^':
+          return Math.pow(this.left.evaluate(), this.right.evaluate())
+        default:
+          return null
+      }
+    } else {
+      return null
+    }
+  }
 }
 
 const tokenize = (buffer, createToken) => {
@@ -11,14 +53,18 @@ const tokenize = (buffer, createToken) => {
   let result = []
   let pushNumBufferToResult = () => {
     if (numBuffer.length) {
-      result.push(createToken(numBuffer.join(''), 'LITERAL'))
+      result.push(createToken(parseFloat(numBuffer.join('')), 'LITERAL'))
       numBuffer = []
     }
   }
   for (let i = 0; i < buffer.length; i++) {
     let token = buffer[i]
     if (token.type === 'LITERAL' || token.type === 'DECIMAL') {
-      numBuffer.push(token.symbol)
+      if (token.symbol === '\u03A0') {
+        numBuffer.push(Math.PI)
+      } else {
+        numBuffer.push(token.symbol)
+      }
     } else if (token.type === 'OPERATOR' || token.type === 'LEFT_BRACKET' || token.type === 'RIGHT_BRACKET') {
       pushNumBufferToResult()
       result.push(token)
@@ -37,6 +83,8 @@ const shuntingYard = (tokens) => {
     let token = tokens[i]
     if (token.type === 'LITERAL') {
       retStack.push(new ASTNode(token, null, null))
+    } else if (token.type === 'FUNCTION') {
+      opStack.push(token)
     } else if (token.type === 'OPERATOR') {
       while (opStack.length) {
         let top = opStack[opStack.length - 1]
@@ -70,7 +118,8 @@ const shuntingYard = (tokens) => {
 }
 
 const createAST = (buffer, createToken) => {
-  return shuntingYard(tokenize(buffer, createToken))
+  let tree = shuntingYard(tokenize(buffer, createToken))
+  return tree.evaluate()
 }
 
 export default createAST

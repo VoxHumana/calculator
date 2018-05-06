@@ -1,6 +1,6 @@
 import Button from '../components/button'
 import { connect } from 'react-redux'
-import { newToken, updateDisplay } from '../actions'
+import { addToken, removeLastToken, removeAllTokens, updateDisplay, answerDisplay, removeLastDisplay, clearDisplay } from '../actions'
 
 const mapStateToProps = (state, ownProps) => ({
   token: ownProps.token.symbol
@@ -9,9 +9,21 @@ const mapStateToProps = (state, ownProps) => ({
 const mapDispatchToProps = (dispatch, ownProps) => ({
   onClick: () => {
     if (ownProps.token.symbol === '=') {
-      ownProps.calculate()
+      let ans = ownProps.calculate()
+      dispatch(answerDisplay(ans))
+      dispatch(removeAllTokens())
+      dispatch(addToken({
+        type: 'LITERAL',
+        symbol: ans
+      }))
+    } else if (ownProps.token.symbol === 'C') {
+      dispatch(clearDisplay())
+      dispatch(removeAllTokens())
+    } else if (ownProps.token.symbol === '\u2190') {
+      dispatch(removeLastToken())
+      dispatch(removeLastDisplay())
     } else {
-      dispatch(newToken(ownProps.token))
+      dispatch(addToken(ownProps.token))
       dispatch(updateDisplay(ownProps.token.symbol))
     }
   }

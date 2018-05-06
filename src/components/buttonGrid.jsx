@@ -5,7 +5,7 @@ import Grid from './styled/grid'
 export default function ButtonGrid ({ grid, calculate }) {
   return (
     <Grid>
-      {grid.map(row => <ButtonRow tokens={row} calculate={calculate} />)}
+      {grid.map((row, i) => <ButtonRow key={i} tokens={row} calculate={calculate} />)}
     </Grid>
   )
 }
