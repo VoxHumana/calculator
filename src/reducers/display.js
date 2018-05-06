@@ -1,3 +1,8 @@
+const __default = {
+  init: false,
+  contents: 0
+}
+
 const display = (state = {init: false, contents: '0'}, action) => {
   switch (action.type) {
     case 'UPDATE_DISPLAY':
@@ -15,25 +20,28 @@ const display = (state = {init: false, contents: '0'}, action) => {
     case 'ANSWER_DISPLAY':
       return {
         init: true,
-        contents: action.answer
+        contents: `${action.answer}`
       }
     case 'CLEAR_DISPLAY':
-      return {
-        init: false,
-        contents: '0'
-      }
+      return __default
     case 'REMOVE_LAST_DISPLAY':
-      let contents = state.contents.slice(0, state.contents.length - 1)
-      if (!contents.length) {
-        return {
-          init: false,
-          contents: '0'
+      if (state.init) {
+        let contents = state.contents.slice(0, state.contents.length - 1)
+        if (!contents.length) {
+          return __default
+        } else {
+          return {
+            init: true,
+            contents
+          }
         }
       } else {
-        return {
-          init: true,
-          contents
-        }
+        return __default
+      }
+    case 'ERROR_DISPLAY':
+      return {
+        init: false,
+        contents: 'ERROR!'
       }
     default:
       return state

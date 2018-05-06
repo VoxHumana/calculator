@@ -18,14 +18,14 @@ class ASTNode {
             if (num === 0) {
               return 1
             } else {
-              return factorial(num - 1)
+              return num*factorial(num - 1)
             }
           }
           return factorial(this.right.evaluate())
         case '\u221A':
           return Math.sqrt(this.right.evaluate())
         default:
-          return null
+          throw `Unexpected token of type FUNCTION: ${this.token.symbol}`
       }
     } else if (this.token.type === 'OPERATOR') {
       switch (this.token.symbol) {
@@ -40,10 +40,10 @@ class ASTNode {
         case '^':
           return Math.pow(this.left.evaluate(), this.right.evaluate())
         default:
-          return null
+          throw `Unexpected token of type OPERATOR: ${this.token.symbol}`
       }
     } else {
-      return null
+      throw `Unexpected token of type UNKNOWN: ${this.token.type}`
     }
   }
 }
@@ -59,13 +59,13 @@ const tokenize = (buffer, createToken) => {
   }
   for (let i = 0; i < buffer.length; i++) {
     let token = buffer[i]
-    if (token.type === 'LITERAL' || token.type === 'DECIMAL') {
+    if (['LITERAL', 'DECIMAL'].includes(token.type)) {
       if (token.symbol === '\u03A0') {
         numBuffer.push(Math.PI)
       } else {
         numBuffer.push(token.symbol)
       }
-    } else if (token.type === 'OPERATOR' || token.type === 'LEFT_BRACKET' || token.type === 'RIGHT_BRACKET') {
+    } else if (['OPERATOR', 'LEFT_BRACKET', 'RIGHT_BRACKET', 'FUNCTION'].includes(token.type)) {
       pushNumBufferToResult()
       result.push(token)
     }
@@ -79,6 +79,9 @@ const tokenize = (buffer, createToken) => {
 const shuntingYard = (tokens) => {
   let retStack = []
   let opStack = []
+  Array.prototype.peek = function() {
+    return this.slice(-1)[0]
+  }
   for (let i = 0; i < tokens.length; i++) {
     let token = tokens[i]
     if (token.type === 'LITERAL') {
@@ -86,15 +89,12 @@ const shuntingYard = (tokens) => {
     } else if (token.type === 'FUNCTION') {
       opStack.push(token)
     } else if (token.type === 'OPERATOR') {
-      while (opStack.length) {
-        let top = opStack[opStack.length - 1]
-        if ((token.associativity === 'LEFT' && token.precedence <= top.precedence) || (token.associativity === 'RIGHT' && token.precedence < top.precedence)) {
+      while (opStack.peek() && (opStack.peek().type === 'OPERATOR')
+        && ((token.associativity === 'LEFT' && token.precedence <= opStack.peek().precedence)
+        || (token.associativity === 'RIGHT' && token.precedence < opStack.peek().precedence))) {     
           let right = retStack.pop()
           let left = retStack.pop()
           retStack.push(new ASTNode(opStack.pop(), left, right))
-        } else {
-          break
-        }
       }
       opStack.push(token)
     } else if (token.type === 'LEFT_BRACKET') {

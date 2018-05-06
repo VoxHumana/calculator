@@ -1,5 +1,6 @@
 import React from 'react'
 import StyledButton from './styled/button'
+import StyledToken from './styled/token'
 
 export default function Button ({ token, onClick }) {
   let handleClick = (e) => {
@@ -8,6 +9,8 @@ export default function Button ({ token, onClick }) {
   }
 
   return (
-    <StyledButton onClick={handleClick}> {token} </StyledButton>
+    <StyledButton onClick={handleClick}>
+      <StyledToken>{token}</StyledToken>
+    </StyledButton>
   )
 }

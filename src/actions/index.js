@@ -42,3 +42,7 @@ export const removeLastDisplay = () => ({
 export const clearDisplay = () => ({
   type: 'CLEAR_DISPLAY'
 })
+
+export const errorDisplay = () => ({
+  type: 'ERROR_DISPLAY'
+})
