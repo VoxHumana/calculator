@@ -41,7 +41,7 @@ const tokenize = (buffer, createToken) => {
   for (let i = 0; i < buffer.length; i++) {
     let token = buffer[i]
     if (['LITERAL', 'DECIMAL'].includes(token.type)) {
-      if (token.symbol === '\u03A0') {
+      if (token.symbol === '\u03C0') {
         numBuffer.push(Math.PI)
       } else {
         numBuffer.push(token.symbol)
