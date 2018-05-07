@@ -8,25 +8,6 @@ class ASTNode {
   evaluate = () => {
     if (this.token.type === 'LITERAL') {
       return this.token.symbol
-    } else if (this.token.type === 'FUNCTION') {
-      switch (this.token.symbol) {
-        case '!':
-          function factorial(num) {
-            if(num < 0) {
-              return null
-            }
-            if (num === 0) {
-              return 1
-            } else {
-              return num*factorial(num - 1)
-            }
-          }
-          return factorial(this.right.evaluate())
-        case '\u221A':
-          return Math.sqrt(this.right.evaluate())
-        default:
-          throw `Unexpected token of type FUNCTION: ${this.token.symbol}`
-      }
     } else if (this.token.type === 'OPERATOR') {
       switch (this.token.symbol) {
         case '+':
@@ -86,8 +67,6 @@ const shuntingYard = (tokens) => {
     let token = tokens[i]
     if (token.type === 'LITERAL') {
       retStack.push(new ASTNode(token, null, null))
-    } else if (token.type === 'FUNCTION') {
-      opStack.push(token)
     } else if (token.type === 'OPERATOR') {
       while (opStack.peek() && (opStack.peek().type === 'OPERATOR')
         && ((token.associativity === 'LEFT' && token.precedence <= opStack.peek().precedence)

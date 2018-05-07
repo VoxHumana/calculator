@@ -12,6 +12,7 @@ const StyledScreen = styled.div`
   background-color: lightseagreen;
   text-align: right;
   color: white;
+  box-shadow: 3px 3px 4px #111;
 `
 
 export default StyledScreen
